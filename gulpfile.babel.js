@@ -17,7 +17,7 @@ import uglify from 'gulp-uglify';
 
 const production = process.env.NODE_ENV === 'production';
 
-const dependencies = [
+let dependencies = [
   'alt',
   'react',
   'react-router',
@@ -43,19 +43,29 @@ gulp.task('vendor', () => {
 */
 gulp.task('browserify-vendor', () => {
   return browserify()
-    .require(dependancies)
+    .require(dependencies)
     .bundle()
     .pipe(source('vendor.bundle.js'))
-    .pipe(gulpif(production, streamify({ mangle: false })))
+    .pipe(gulpif(production, streamify(uglify({ mangle: false }))))
     .pipe(gulp.dest('public/js'));
+});
+
+gulp.task('browserify', ['browserify-vendor'], () => {
+  return browserify('app/main.js')
+  .external(dependencies)
+  .transform(babelify)
+  .bundle()
+  .pipe(source('bundle.js'))
+  .pipe(gulpif(production, streamify(uglify({ mangle: false }))))
+  .pipe(gulp.dest('public/js'));
 });
 
 /*
  / Compile only project files, excluding all third-party
 */
-gulp.task('browserify', ['browserify-vendor'], () => {
+gulp.task('browserify-watch', ['browserify-vendor'], () => {
   let bundler = watchify(browserify('app/main.js', watchify.args));
-  bundler.external(dependancies);
+  bundler.external(dependencies);
   bundler.transform(babelify);
   bundler.on('update', rebundle);
   return rebundle();
