@@ -23,7 +23,7 @@ class Navbar extends Component {
     let socket = io.connect();
 
     socket.on('onlineUsers', (data) => {
-      NavbarActions.updateOnlineUsers(dat);
+      NavbarActions.updateOnlineUsers(data);
     });
 
     $(document).ajaxStart(() => {
