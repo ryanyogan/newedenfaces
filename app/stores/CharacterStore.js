@@ -24,7 +24,7 @@ class CharacterStore {
     let localData = localStorage.getItem('NEF') ? JSON.parse(localStorage.getItem('NEF')) : {};
     let reports = localData.reports || [];
     this.isReported = contains(reports, this.characterId);
-    this.winLossRation = ((this.wins / (this.wins + this.losses) * 100) || 0).toFixed(1);
+    this.winLossRatio = ((this.wins / (this.wins + this.losses) * 100) || 0).toFixed(1);
   }
 
   onGetCharacterFail(jqXhr) {

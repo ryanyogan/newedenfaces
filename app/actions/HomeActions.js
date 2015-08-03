@@ -14,7 +14,6 @@ class HomeActions {
   getTwoCharacters() {
     $.ajax({ url: '/api/characters' })
       .done(data => {
-        console.log(data);
         this.actions.getTwoCharactersSuccess(data);
       })
       .fail(jqXhr => {

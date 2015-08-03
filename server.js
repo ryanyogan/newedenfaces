@@ -202,7 +202,6 @@ app.post('/api/characters', (req, res, next) => {
               res.send({ message: `${characterName} has been added successfully!` });
             });
           } catch(e) {
-            console.log(`HEY RYAN!!!: ${e}`);
             res.status(404).send({ message: `${characterName} is not registered` });
           }
         });
@@ -302,102 +301,103 @@ app.post('/api/report', (req, res, next) => {
 /**
  * GET /api/stats
 */
-app.get('/api/stats', (req, res, next) => {
+app.get('/api/stats', function(req, res, next) {
   async.parallel([
-    function(cb) {
-      Character.cound({}, (err, count) => {
-        cb(err, count);
-      });
-    },
-    function(cb) {
-      Character.count({ race: 'Amarr' }, (err, amarrCount) => {
-        cb(err, amarrCount);
-      });
-    },
-    function(cb) {
-      Character.count({ race: 'Caldari' }, (err, caldariCount) => {
-        cb(err, caldariCount);
-      });
-    },
-    function(cb) {
-      Character.count({ race: 'Gallente' }, (err, gallenteCount) => {
-        cb(err, gallenteCount);
-      });
-    },
-    function(cb) {
-      Character.count({ race: 'Minmatar' }, (err, minmatarCount) => {
-        cb(err, minmatarCount);
-      });
-    },
-    function(cb) {
-      Character.count({ gender: 'Male' }, (err, maleCount) => {
-        cb(err, maleCount);
-      });
-    },
-    function(cb) {
-      Character.count({ gender: 'Female' }, (err, femaleCount) => {
-        cb(err, femaleCount);
-      });
-    },
-    function(cb) {
-      Character.aggregate({ $group: { _id: null, total: { $sum: '$wins' } } }, (err, totalVotes) => {
-        let total = totalVotes.length ? totalVotes[0].total : 0;
-        cb(err, total);
-      });
-    },
-    function(cb) {
-      Character
-        .find()
-        .sort('-wins')
-        .limit(100)
-        .select('race')
-        .exec((err, characters) => {
-          if (err) return next(err);
-
-          let raceCount = _.countBy(characters, (character => character.race));
-          let max = _.max(raceCount, (race => race));
-          let inverted = _.invert(raceCount);
-          let topRace = inverted[max];
-          let topCount = raceCount[topRace];
-
-          cb(err, { race: topRace, count: topCount });
+      function(callback) {
+        Character.count({}, function(err, count) {
+          callback(err, count);
         });
-    },
-    function(cb) {
-      Character
-        .find()
-        .sort('-wins')
-        .limit(100)
-        .select('bloodline')
-        .exec((err, characters) => {
-          if (err) return next(err);
-
-          let bloodlineCount = _.countBy(characters, (character => character.bloodline));
-          let max = _max(bloodlineCount, (bloodline => bloodline));
-          let inverted = _.invert(bloodlineCount);
-          let topBloodline = inverted(max);
-          let topCount = bloodlineCount[topBloodline];
-
-          cb(err, { bloodline: topBloodline, count: topCount });
+      },
+      function(callback) {
+        Character.count({ race: 'Amarr' }, function(err, amarrCount) {
+          callback(err, amarrCount);
         });
-    }
-  ],
-  function(err, results) {
-    if (err) return next(err);
+      },
+      function(callback) {
+        Character.count({ race: 'Caldari' }, function(err, caldariCount) {
+          callback(err, caldariCount);
+        });
+      },
+      function(callback) {
+        Character.count({ race: 'Gallente' }, function(err, gallenteCount) {
+          callback(err, gallenteCount);
+        });
+      },
+      function(callback) {
+        Character.count({ race: 'Minmatar' }, function(err, minmatarCount) {
+          callback(err, minmatarCount);
+        });
+      },
+      function(callback) {
+        Character.count({ gender: 'Male' }, function(err, maleCount) {
+          callback(err, maleCount);
+        });
+      },
+      function(callback) {
+        Character.count({ gender: 'Female' }, function(err, femaleCount) {
+          callback(err, femaleCount);
+        });
+      },
+      function(callback) {
+        Character.aggregate({ $group: { _id: null, total: { $sum: '$wins' } } }, function(err, totalVotes) {
+            var total = totalVotes.length ? totalVotes[0].total : 0;
+            callback(err, total);
+          }
+        );
+      },
+      function(callback) {
+        Character
+          .find()
+          .sort('-wins')
+          .limit(100)
+          .select('race')
+          .exec(function(err, characters) {
+            if (err) return next(err);
 
-    res.send({
-      totalCount: results[0],
-      amarrCount: results[1],
-      caldariCount: results[2],
-      gallenteCount: results[3],
-      minmaterCount: results[4],
-      maleCount: results[5],
-      femaleCount: results[6],
-      totaleVotes: results[7],
-      leadingRace: results[8],
-      leadingBloodline: results[0]
+            var raceCount = _.countBy(characters, function(character) { return character.race; });
+            var max = _.max(raceCount, function(race) { return race });
+            var inverted = _.invert(raceCount);
+            var topRace = inverted[max];
+            var topCount = raceCount[topRace];
+
+            callback(err, { race: topRace, count: topCount });
+          });
+      },
+      function(callback) {
+        Character
+          .find()
+          .sort('-wins')
+          .limit(100)
+          .select('bloodline')
+          .exec(function(err, characters) {
+            if (err) return next(err);
+
+            var bloodlineCount = _.countBy(characters, function(character) { return character.bloodline; });
+            var max = _.max(bloodlineCount, function(bloodline) { return bloodline });
+            var inverted = _.invert(bloodlineCount);
+            var topBloodline = inverted[max];
+            var topCount = bloodlineCount[topBloodline];
+
+            callback(err, { bloodline: topBloodline, count: topCount });
+          });
+      }
+    ],
+    function(err, results) {
+      if (err) return next(err);
+
+      res.send({
+        totalCount: results[0],
+        amarrCount: results[1],
+        caldariCount: results[2],
+        gallenteCount: results[3],
+        minmatarCount: results[4],
+        maleCount: results[5],
+        femaleCount: results[6],
+        totalVotes: results[7],
+        leadingRace: results[8],
+        leadingBloodline: results[9]
+      });
     });
-  });
 });
 
 /**
@@ -427,7 +427,7 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.log(err.stack.red);
-  res.stats(err.status || 500);
+  res.status(err.status || 500);
   res.send({ message: err.message });
 });
 
