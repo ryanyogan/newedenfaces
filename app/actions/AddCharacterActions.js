@@ -24,6 +24,7 @@ class AddCharacterActions {
       this.actions.addCharacterSuccess(data.message);
     })
     .fail((jqXhr) => {
+      console.log(jqXhr);
       this.actions.addCharacterFail(jqXhr.responseJSON.message);
     });
   }
