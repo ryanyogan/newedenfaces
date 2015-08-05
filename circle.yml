@@ -7,7 +7,7 @@ dependencies:
 test:
   override:
     - sudo pip install --upgrade docker-compose
-    - npm gulp test
+    - npm test
 deployment:
   hub:
     branch: master
