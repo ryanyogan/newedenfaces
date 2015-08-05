@@ -1,0 +1,12 @@
+web:
+  build: ./
+  volumes:
+    - ".:/src"
+  ports:
+    - "80:3000"
+  links:
+    - mongo
+mongo:
+  image: mongo:latest
+  ports:
+    - "27017:27017"
